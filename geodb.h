@@ -78,43 +78,49 @@ class GeoDatabase: public GeoDatabaseBase {
                 Data end = { count, name, e_geopoint, set<string>() };
                 count++;
                 resolve_connections(temp, end);
-                GeoPoint m_geopoint = midpoint(s_geopoint, e_geopoint);
-                Data midpoint_data = { count, name, m_geopoint, set<string>() };
-                count++;
-                connect(start, midpoint_data);
-                connect(end, midpoint_data);
-                for (int i = 0; i < poi; i++) {
-                    getline(file, poi_data);
-                    size_t delimiterPos = poi_data.find('|');
-                    string poi_name = poi_data.substr(0, delimiterPos);
-                    string coordinates = poi_data.substr(delimiterPos + 1);
-                    double latitude, longitude;
-                    istringstream poi_coord_iss(coordinates);
-                    poi_coord_iss >> latitude >> longitude;
-                    GeoPoint poi_geopoint = GeoPoint(to_string(latitude), to_string(longitude));
-                    Data poi_data = { count, poi_name, poi_geopoint, set<string>() };
-                    connect(poi_data, midpoint_data);
+                if (poi > 0) {
+                    GeoPoint m_geopoint = midpoint(s_geopoint, e_geopoint);
+                    Data midpoint_data = { count, name, m_geopoint, set<string>() };
                     count++;
-                    pois.insert(poi_name, poi_geopoint);
-                    checked_insert(poi_data);
-                    add_street(midpoint_data.gp, poi_data.gp, "a path");
-                    // geopoints.insert(poi_data.gp.to_string(), poi_data);
-                    //cout << "Inserted poi named " << poi_name << " at " << poi_geopoint.to_string() << " with midpoint " << midpoint_data.gp.to_string() << endl;
-                    //cout << poi_name << " connected to " << *poi_data.connections.begin() << endl;
-                }
-                if (geopoints.find(start.gp.to_string()) != nullptr) {
-                    Data* d = geopoints.find(start.gp.to_string());
-                    d->connections.insert(start.connections.begin(), start.connections.end());
-                }
+                    connect(start, midpoint_data);
+                    connect(end, midpoint_data);
+                    for (int i = 0; i < poi; i++) {
+                        getline(file, poi_data);
+                        size_t delimiterPos = poi_data.find('|');
+                        string poi_name = poi_data.substr(0, delimiterPos);
+                        string coordinates = poi_data.substr(delimiterPos + 1);
+                        double latitude, longitude;
+                        istringstream poi_coord_iss(coordinates);
+                        poi_coord_iss >> latitude >> longitude;
+                        GeoPoint poi_geopoint = GeoPoint(to_string(latitude), to_string(longitude));
+                        Data poi_data = { count, poi_name, poi_geopoint, set<string>() };
+                        connect(poi_data, midpoint_data);
+                        count++;
+                        pois.insert(poi_name, poi_geopoint);
+                        checked_insert(poi_data);
+                        add_street(midpoint_data.gp, poi_data.gp, "a path");
+                        // geopoints.insert(poi_data.gp.to_string(), poi_data);
+                        //cout << "Inserted poi named " << poi_name << " at " << poi_geopoint.to_string() << " with midpoint " << midpoint_data.gp.to_string() << endl;
+                        //cout << poi_name << " connected to " << *poi_data.connections.begin() << endl;
+                    }
+                    // if (geopoints.find(start.gp.to_string()) != nullptr) {
+                    //     Data* d = geopoints.find(start.gp.to_string());
+                    //     d->connections.insert(start.connections.begin(), start.connections.end());
+                    // }
             
-                checked_insert(midpoint_data);
-                add_street(start.gp, midpoint_data.gp, name);
-                add_street(midpoint_data.gp, end.gp, name);
+                    checked_insert(midpoint_data);
+                    add_street(start.gp, midpoint_data.gp, name);
+                    add_street(midpoint_data.gp, end.gp, name);
+                    temp.push_back(midpoint_data);
+
+                }
 
 
                 checked_insert(start);
                 checked_insert(end);
                 add_street(start.gp, end.gp, name);
+                temp.push_back(start);
+                temp.push_back(end);
                 // geopoints.insert(start.gp.to_string(), start);
                 // geopoints.insert(end.gp.to_string(), end);
                 // geopoints.insert(midpoint_data.gp.to_string(), midpoint_data);
