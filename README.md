@@ -1,1 +1,1 @@
-UCLA cs32 BruinTour Final Project. You're welcome. The algorithm used to pathfind is not the optimal algorithm. Womp womp. However, you'll probably get above a 90 is you submit this code verbatim however. If you want to improve it think about how you can sort the paths so that the most likely ones are worked on first. I do not go to UCLA. I did this for fun. 
+lol
